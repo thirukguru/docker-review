@@ -1,0 +1,19 @@
+# Bad Dockerfile with multiple issues for testing
+FROM ubuntu
+MAINTAINER deprecated@example.com
+
+ENV PASSWORD=mysecret123
+ENV API_KEY=abc123xyz
+
+COPY . /app
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y curl python3
+
+RUN curl -sSL https://install.example.com/script.sh | bash
+
+RUN pip install requests flask
+
+EXPOSE 8080
+
+CMD ["python3", "app.py"]
