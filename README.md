@@ -7,7 +7,7 @@ A fast, offline-first CLI tool that reviews Docker configurations like a Senior 
 
 ## Features
 
-- **Dockerfile Analysis** - Detects 10 types of issues
+- **Dockerfile Analysis** - Detects 11 types of issues
 - **Docker Compose Analysis** - Detects 5 types of issues  
 - **Security Checks** - Root user, secrets in ENV, curl|bash patterns
 - **Performance Checks** - Layer ordering, large images, caching issues
@@ -80,7 +80,7 @@ docker-review explain DC002
 
 ## Rules
 
-### Dockerfile Rules (DF001-DF010)
+### Dockerfile Rules (DF001-DF011)
 
 | ID | Name | Severity |
 |----|------|----------|
@@ -94,6 +94,7 @@ docker-review explain DC002
 | DF008 | Missing multi-stage build | Suggestion |
 | DF009 | Large base image | Suggestion |
 | DF010 | Curl pipe to shell | Critical |
+| DF011 | Inefficient layer usage | Warning |
 
 ### Docker Compose Rules (DC001-DC005)
 

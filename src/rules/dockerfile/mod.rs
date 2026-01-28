@@ -8,6 +8,7 @@ mod version_pinning;
 mod multistage;
 mod large_base_image;
 mod curl_bash;
+mod layer_optimization;
 
 pub use latest_tag::LatestTagRule;
 pub use root_user::RootUserRule;
@@ -19,6 +20,7 @@ pub use version_pinning::VersionPinningRule;
 pub use multistage::MultistageRule;
 pub use large_base_image::LargeBaseImageRule;
 pub use curl_bash::CurlBashRule;
+pub use layer_optimization::LayerOptimizationRule;
 
 use super::{Rule, Issue, Severity, ImpactEstimate};
 use crate::parser::DockerfileParser;

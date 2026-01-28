@@ -104,6 +104,7 @@ impl Analyzer {
         issues.extend(MultistageRule.check(&parser, context_dir));
         issues.extend(LargeBaseImageRule.check(&parser, context_dir));
         issues.extend(CurlBashRule.check(&parser, context_dir));
+        issues.extend(LayerOptimizationRule.check(&parser, context_dir));
 
         // Sort by severity (critical first)
         issues.sort_by(|a, b| b.severity.cmp(&a.severity));

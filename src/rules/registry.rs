@@ -17,6 +17,7 @@ static DOCKERFILE_RULES: Lazy<Vec<Box<dyn Rule>>> = Lazy::new(|| {
         Box::new(MultistageRule),
         Box::new(LargeBaseImageRule),
         Box::new(CurlBashRule),
+        Box::new(LayerOptimizationRule),
     ]
 });
 
