@@ -2,8 +2,8 @@
 
 A fast, offline-first CLI tool that reviews Docker configurations like a Senior DevOps Engineer. It detects performance issues, security vulnerabilities, and maintainability problems, providing actionable suggestions and impact estimates.
 
-[![CI](https://github.com/YOUR_USERNAME/docker-review/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/docker-review/actions/workflows/ci.yml)
-[![Release](https://github.com/YOUR_USERNAME/docker-review/actions/workflows/release.yml/badge.svg)](https://github.com/YOUR_USERNAME/docker-review/releases)
+[![CI](https://github.com/thirukguru/docker-review/actions/workflows/ci.yml/badge.svg)](https://github.com/thirukguru/docker-review/actions/workflows/ci.yml)
+[![Release](https://github.com/thirukguru/docker-review/actions/workflows/release.yml/badge.svg)](https://github.com/thirukguru/docker-review/releases)
 
 ## Features
 
@@ -21,13 +21,13 @@ A fast, offline-first CLI tool that reviews Docker configurations like a Senior 
 ### Quick Install (Linux/macOS)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/docker-review/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/thirukguru/docker-review/main/install.sh | bash
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/docker-review.git
+git clone https://github.com/thirukguru/docker-review.git
 cd docker-review
 cargo build --release
 sudo cp target/release/docker-review /usr/local/bin/
@@ -35,7 +35,7 @@ sudo cp target/release/docker-review /usr/local/bin/
 
 ### From Releases
 
-Download the binary for your platform from [Releases](https://github.com/YOUR_USERNAME/docker-review/releases).
+Download the binary for your platform from [Releases](https://github.com/thirukguru/docker-review/releases).
 
 ## Usage
 
@@ -134,7 +134,7 @@ File: Dockerfile
 ```yaml
 - name: Analyze Dockerfile
   run: |
-    curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/docker-review/main/install.sh | bash
+    curl -fsSL https://raw.githubusercontent.com/thirukguru/docker-review/main/install.sh | bash
     docker-review analyze . --ci --fail-on critical
 ```
 
@@ -143,7 +143,7 @@ File: Dockerfile
 ```yaml
 docker-review:
   script:
-    - curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/docker-review/main/install.sh | bash
+    - curl -fsSL https://raw.githubusercontent.com/thirukguru/docker-review/main/install.sh | bash
     - docker-review analyze . --ci --fail-on critical
 ```
 

@@ -19,7 +19,7 @@ ls -lh target/release/docker-review
 ### Step 2: Create GitHub Release
 
 1. Go to your GitHub repository
-2. Click **"Releases"** (right sidebar) or go to `https://github.com/YOUR_USERNAME/docker-review/releases`
+2. Click **"Releases"** (right sidebar) or go to `https://github.com/thirukguru/docker-review/releases`
 3. Click **"Create a new release"** or **"Draft a new release"**
 
 ### Step 3: Fill Release Details
@@ -53,7 +53,7 @@ ls -lh target/release/docker-review
 
 Test the install script:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/docker-review/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/thirukguru/docker-review/main/install.sh | bash
 ```
 
 ---
@@ -99,7 +99,7 @@ echo "Upload this file to GitHub Release:"
 ls -lh releases/
 
 echo ""
-echo "Go to: https://github.com/YOUR_USERNAME/docker-review/releases/new"
+echo "Go to: https://github.com/thirukguru/docker-review/releases/new"
 echo "1. Tag: ${VERSION}"
 echo "2. Title: ${VERSION}"
 echo "3. Upload: releases/docker-review-${VERSION}-linux-amd64"
@@ -114,13 +114,13 @@ echo "4. Click 'Publish release'"
 
 Go to https://github.com/new and create `docker-review` repository.
 
-### 2. Update YOUR_USERNAME
+### 2. Update thirukguru
 
-Replace `YOUR_USERNAME` with your actual GitHub username:
+Replace `thirukguru` with your actual GitHub username:
 
 ```bash
 # Replace in all files
-sed -i 's/YOUR_USERNAME/your-github-username/g' install.sh README.md RELEASING.md
+sed -i 's/thirukguru/your-github-username/g' install.sh README.md RELEASING.md
 ```
 
 ### 3. Push Code to GitHub
@@ -134,7 +134,7 @@ git add .
 git commit -m "Initial commit: docker-review CLI v0.1.0"
 
 # Add remote and push
-git remote add origin https://github.com/YOUR_USERNAME/docker-review.git
+git remote add origin https://github.com/thirukguru/docker-review.git
 git branch -M main
 git push -u origin main
 ```

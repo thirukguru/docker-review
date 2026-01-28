@@ -2,12 +2,12 @@
 set -e
 
 # Docker Review CLI Installer
-# Usage: curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/docker-review/main/install.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/thirukguru/docker-review/main/install.sh | bash
 
 VERSION="${VERSION:-latest}"
 INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"
 BINARY_NAME="docker-review"
-REPO="YOUR_USERNAME/docker-review"
+REPO="thirukguru/docker-review"
 
 # Colors
 RED='\033[0;31m'
