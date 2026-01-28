@@ -100,7 +100,7 @@ download_binary() {
     local TMP_DIR=$(mktemp -d)
     local TMP_FILE="${TMP_DIR}/${BINARY_NAME}"
 
-    info "Downloading from: $DOWNLOAD_URL"
+    info "Downloading from: $DOWNLOAD_URL" >&2
     
     if curl -fsSL "$DOWNLOAD_URL" -o "$TMP_FILE" 2>/dev/null; then
         chmod +x "$TMP_FILE"
@@ -110,7 +110,7 @@ download_binary() {
     
     # Try with .tar.gz extension
     DOWNLOAD_URL="${DOWNLOAD_URL}.tar.gz"
-    info "Trying: $DOWNLOAD_URL"
+    info "Trying: $DOWNLOAD_URL" >&2
     
     if curl -fsSL "$DOWNLOAD_URL" -o "${TMP_FILE}.tar.gz" 2>/dev/null; then
         tar -xzf "${TMP_FILE}.tar.gz" -C "$TMP_DIR"
