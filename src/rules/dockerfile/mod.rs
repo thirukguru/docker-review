@@ -9,6 +9,7 @@ mod multistage;
 mod large_base_image;
 mod curl_bash;
 mod layer_optimization;
+mod ml_stack;
 
 pub use latest_tag::LatestTagRule;
 pub use root_user::RootUserRule;
@@ -21,6 +22,7 @@ pub use multistage::MultistageRule;
 pub use large_base_image::LargeBaseImageRule;
 pub use curl_bash::CurlBashRule;
 pub use layer_optimization::LayerOptimizationRule;
+pub use ml_stack::MLStackRule;
 
 use super::{Rule, Issue, Severity, ImpactEstimate};
 use crate::parser::DockerfileParser;
@@ -29,3 +31,4 @@ use crate::parser::DockerfileParser;
 pub trait DockerfileRule: Rule {
     fn check(&self, parser: &DockerfileParser, context_dir: Option<&std::path::Path>) -> Vec<Issue>;
 }
+

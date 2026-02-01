@@ -81,4 +81,16 @@ pub struct AnalyzeArgs {
     /// Show estimated impact of issues
     #[arg(long)]
     pub estimate_impact: bool,
+
+    /// Auto-generate optimized Dockerfile
+    #[arg(long)]
+    pub fix: bool,
+
+    /// Output path for fixed Dockerfile (defaults to Dockerfile.optimized)
+    #[arg(long, value_name = "PATH")]
+    pub fix_output: Option<PathBuf>,
+
+    /// Show diff between original and fixed Dockerfile
+    #[arg(long)]
+    pub diff: bool,
 }

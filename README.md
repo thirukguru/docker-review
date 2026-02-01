@@ -58,6 +58,19 @@ docker-review analyze docker-compose.yml
 docker-review analyze Dockerfile --json
 ```
 
+### Auto-Fix Dockerfiles (NEW)
+
+```bash
+# Generate optimized Dockerfile
+docker-review analyze Dockerfile --fix
+
+# Save to custom path
+docker-review analyze Dockerfile --fix --fix-output Dockerfile.optimized
+
+# Show diff of changes
+docker-review analyze Dockerfile --fix --diff
+```
+
 ### CI Mode with Failure Threshold
 
 ```bash
@@ -80,7 +93,7 @@ docker-review explain DC002
 
 ## Rules
 
-### Dockerfile Rules (DF001-DF011)
+### Dockerfile Rules (DF001-DF012)
 
 | ID | Name | Severity |
 |----|------|----------|
@@ -95,6 +108,7 @@ docker-review explain DC002
 | DF009 | Large base image | Suggestion |
 | DF010 | Curl pipe to shell | Critical |
 | DF011 | Inefficient layer usage | Warning |
+| DF012 | ML stack optimization | Suggestion |
 
 ### Docker Compose Rules (DC001-DC005)
 

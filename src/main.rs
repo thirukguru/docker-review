@@ -3,7 +3,10 @@ use docker_review::cli::{Cli, Commands};
 use docker_review::analyzer::Analyzer;
 use docker_review::output::{JsonOutput, TerminalOutput, OutputFormatter};
 use docker_review::rules::Severity;
+use docker_review::fixer::DockerfileFixer;
+use docker_review::parser::DockerfileParser;
 use std::process::ExitCode;
+use std::path::PathBuf;
 
 fn main() -> ExitCode {
     let cli = Cli::parse();
@@ -35,21 +38,64 @@ fn main() -> ExitCode {
                         file_path: report.file_path.clone(),
                     };
 
-                    // Output format
-                    if args.json {
-                        let output = JsonOutput;
-                        println!("{}", output.format(&filtered_report));
-                    } else if !args.summary_only {
-                        let output = TerminalOutput::new(cli.verbose, args.estimate_impact);
-                        println!("{}", output.format(&filtered_report));
+                    // Output format (skip if --fix is the primary action)
+                    if !args.fix {
+                        if args.json {
+                            let output = JsonOutput;
+                            println!("{}", output.format(&filtered_report));
+                        } else if !args.summary_only {
+                            let output = TerminalOutput::new(cli.verbose, args.estimate_impact);
+                            println!("{}", output.format(&filtered_report));
+                        }
+
+                        // Summary for --summary-only or always show summary
+                        if args.summary_only {
+                            println!("Issues found: {}", filtered_report.issues.len());
+                            println!("  Critical: {}", filtered_report.issues.iter().filter(|i| i.severity == Severity::Critical).count());
+                            println!("  Warning: {}", filtered_report.issues.iter().filter(|i| i.severity == Severity::Warning).count());
+                            println!("  Suggestion: {}", filtered_report.issues.iter().filter(|i| i.severity == Severity::Suggestion).count());
+                        }
                     }
 
-                    // Summary for --summary-only or always show summary
-                    if args.summary_only {
-                        println!("Issues found: {}", filtered_report.issues.len());
-                        println!("  Critical: {}", filtered_report.issues.iter().filter(|i| i.severity == Severity::Critical).count());
-                        println!("  Warning: {}", filtered_report.issues.iter().filter(|i| i.severity == Severity::Warning).count());
-                        println!("  Suggestion: {}", filtered_report.issues.iter().filter(|i| i.severity == Severity::Suggestion).count());
+                    // Handle --fix flag
+                    if args.fix {
+                        // Only works for Dockerfiles
+                        if let Ok(parser) = DockerfileParser::parse(&args.path) {
+                            let fix_result = DockerfileFixer::fix(&parser, &report.issues);
+                            
+                            // Show diff if requested
+                            if args.diff {
+                                println!("{}", fix_result.generate_diff());
+                            }
+                            
+                            // Determine output path
+                            let output_path = args.fix_output.unwrap_or_else(|| {
+                                PathBuf::from("Dockerfile.optimized")
+                            });
+                            
+                            // Write or print the optimized Dockerfile
+                            if output_path.as_os_str() == "-" {
+                                // Output to stdout
+                                println!("{}", fix_result.optimized_content);
+                            } else {
+                                match std::fs::write(&output_path, &fix_result.optimized_content) {
+                                    Ok(_) => {
+                                        println!("✓ Optimized Dockerfile written to: {}", output_path.display());
+                                        println!("  {} change(s) made:", fix_result.changes.len());
+                                        for change in &fix_result.changes {
+                                            println!("    Line {}: {}", change.line_number, change.description);
+                                        }
+                                    }
+                                    Err(e) => {
+                                        eprintln!("Error writing optimized Dockerfile: {}", e);
+                                        return ExitCode::from(1);
+                                    }
+                                }
+                            }
+                        } else {
+                            eprintln!("Error: --fix only works with Dockerfiles, not compose files");
+                            return ExitCode::from(1);
+                        }
                     }
 
                     // Exit code for CI
@@ -83,3 +129,4 @@ fn main() -> ExitCode {
 
     ExitCode::SUCCESS
 }
+
