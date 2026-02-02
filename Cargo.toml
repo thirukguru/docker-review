@@ -1,6 +1,6 @@
 [package]
 name = "docker-review"
-version = "0.1.0"
+version = "0.3.1"
 edition = "2021"
 authors = ["Docker Review Team"]
 description = "A fast CLI tool for analyzing Dockerfiles and docker-compose files"
