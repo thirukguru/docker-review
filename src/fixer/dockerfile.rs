@@ -64,24 +64,23 @@ lines[*idx] = new_content.clone();
 }
 }
 
-// DF002: Add non-root user if missing
-if issue_rules.contains("DF002") && !has_user_instruction {
-// Find the last instruction before CMD/ENTRYPOINT
-if let Some(insert_line) = Self::find_user_insertion_point(parser) {
-insertions.push((insert_line, 0, "\n# Run as non-root user for security".to_string()));
-insertions.push((insert_line, 1, "RUN useradd -m -s /bin/bash appuser".to_string()));
-insertions.push((insert_line, 2, "USER appuser".to_string()));
-result.add_change(insert_line + 1, "Added non-root user");
+// DF005: Add HEALTHCHECK if missing (insert first, before USER)
+if issue_rules.contains("DF005") && !has_healthcheck {
+if let Some(insert_line) = Self::find_healthcheck_insertion_point(parser) {
+insertions.push((insert_line, 0, "\nHEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \\".to_string()));
+insertions.push((insert_line, 1, "    CMD curl -f http://localhost:8080/health || exit 1".to_string()));
+result.add_change(insert_line + 1, "Added HEALTHCHECK instruction");
 }
 }
 
-// DF005: Add HEALTHCHECK if missing
-if issue_rules.contains("DF005") && !has_healthcheck {
-if let Some(insert_line) = Self::find_healthcheck_insertion_point(parser) {
-insertions.push((insert_line, 3, "\n# Health check".to_string()));
-insertions.push((insert_line, 4, "HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \\".to_string()));
-insertions.push((insert_line, 5, "    CMD curl -f http://localhost:8080/health || exit 1".to_string()));
-result.add_change(insert_line + 1, "Added HEALTHCHECK instruction");
+// DF002: Add non-root user if missing (insert after HEALTHCHECK)
+if issue_rules.contains("DF002") && !has_user_instruction {
+// Find the last instruction before CMD/ENTRYPOINT
+if let Some(insert_line) = Self::find_user_insertion_point(parser) {
+insertions.push((insert_line, 2, "\n# Run as non-root user for security".to_string()));
+insertions.push((insert_line, 3, "RUN useradd -m -s /bin/bash appuser".to_string()));
+insertions.push((insert_line, 4, "USER appuser".to_string()));
+result.add_change(insert_line + 1, "Added non-root user");
 }
 }
 

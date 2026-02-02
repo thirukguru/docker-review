@@ -1,30 +1,30 @@
-# Bad Dockerfile with multiple issues for testing
+# Optimized Dockerfile
 FROM ubuntu:22.04
-MAINTAINER deprecated@example.com
 
-# REMOVED (secret detected): ENV PASSWORD=mysecret123
-# REMOVED (secret detected): ENV API_KEY=abc123xyz
+LABEL maintainer="deprecated@example.com"
 
-COPY . /app
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y curl python3
+# Install dependencies and clean up in a single layer
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    python3 \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
 
-# SECURITY WARNING: curl|bash pattern detected - review manually
-RUN curl -sSL https://install.example.com/script.sh | bash
+RUN pip install --no-cache-dir requests flask
 
-RUN pip install requests flask
+COPY . /app
+
+# Create non-root user for security
+RUN useradd -m -s /bin/bash appuser
+
+# Switch to non-root user
+USER appuser
 
 EXPOSE 8080
 
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8080/health || exit 1
 
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-
-# Health check
-USER appuser
-
-RUN useradd -m -s /bin/bash appuser
-
-# Run as non-root user for security
 CMD ["python3", "app.py"]
