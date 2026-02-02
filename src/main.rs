@@ -40,6 +40,16 @@ fn main() -> ExitCode {
 
                     // Output format (skip if --fix is the primary action)
                     if !args.fix {
+                        // TODO: HTML and PDF reports not yet implemented
+                        if args.html {
+                            eprintln!("⚠ HTML report generation is not yet implemented. Coming soon!");
+                            eprintln!("  For now, use --json and convert with external tools.");
+                        }
+                        if args.pdf {
+                            eprintln!("⚠ PDF report generation is not yet implemented. Coming soon!");
+                            eprintln!("  For now, use --json and convert with external tools.");
+                        }
+
                         if args.json {
                             let output = JsonOutput;
                             println!("{}", output.format(&filtered_report));
