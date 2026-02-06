@@ -62,14 +62,40 @@ func analyzeDockerfile(path string) (*Report, error) {
 		allIssues = append(allIssues, issues...)
 	}
 
-	scores := scoring.Calculate(allIssues)
+	// Filter out ignored issues
+	filteredIssues := filterIgnoredIssues(allIssues, ctx.IgnoredRules)
+	scores := scoring.Calculate(filteredIssues)
 
 	return &Report{
 		FilePath: path,
 		FileType: "dockerfile",
-		Issues:   allIssues,
+		Issues:   filteredIssues,
 		Scores:   scores,
 	}, nil
+}
+
+// filterIgnoredIssues removes issues that match ignore comments
+func filterIgnoredIssues(issues []types.Issue, ignoredRules map[int][]string) []types.Issue {
+	if len(ignoredRules) == 0 {
+		return issues
+	}
+
+	var filtered []types.Issue
+	for _, issue := range issues {
+		ignored := false
+		if ruleIDs, ok := ignoredRules[issue.Line]; ok {
+			for _, id := range ruleIDs {
+				if id == issue.RuleID || id == "all" {
+					ignored = true
+					break
+				}
+			}
+		}
+		if !ignored {
+			filtered = append(filtered, issue)
+		}
+	}
+	return filtered
 }
 
 func analyzeCompose(path string) (*Report, error) {

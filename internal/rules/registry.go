@@ -43,6 +43,7 @@ func init() {
 		dockerfile.NewCurlBashRule(),
 		dockerfile.NewLayerOptimizationRule(),
 		dockerfile.NewMLStackRule(),
+		dockerfile.NewDockerignoreContentRule(),
 	}
 
 	composeRules = []types.ComposeRule{
@@ -86,7 +87,7 @@ func GetRuleByID(id string) types.Rule {
 
 // PrintAllRules prints all available rules
 func PrintAllRules() {
-	fmt.Println("Dockerfile Rules (DF001-DF012):")
+	fmt.Println("Dockerfile Rules (DF001-DF013):")
 	fmt.Println("================================")
 	for _, r := range dockerfileRules {
 		fmt.Printf("  %-6s %-30s %s\n", r.ID(), r.Name(), r.Severity())

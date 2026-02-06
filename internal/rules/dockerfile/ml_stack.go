@@ -31,10 +31,36 @@ type mlFramework struct {
 }
 
 var mlFrameworks = []mlFramework{
+	// Deep Learning
 	{Name: "TensorFlow", Packages: []string{"tensorflow", "keras"}, Suggestion: "Consider tensorflow/tensorflow:gpu"},
-	{Name: "PyTorch", Packages: []string{"torch", "torchvision"}, Suggestion: "Consider pytorch/pytorch"},
-	{Name: "JAX", Packages: []string{"jax", "jaxlib"}, Suggestion: "Consider gcr.io/jax-releases/jax"},
-	{Name: "Hugging Face", Packages: []string{"transformers", "datasets"}, Suggestion: "Consider huggingface/transformers-pytorch-gpu"},
+	{Name: "PyTorch", Packages: []string{"torch", "torchvision", "torchaudio"}, Suggestion: "Consider pytorch/pytorch"},
+	{Name: "JAX", Packages: []string{"jax", "jaxlib", "flax"}, Suggestion: "Consider gcr.io/jax-releases/jax"},
+	{Name: "Hugging Face", Packages: []string{"transformers", "datasets", "accelerate"}, Suggestion: "Consider huggingface/transformers-pytorch-gpu"},
+	{Name: "FastAI", Packages: []string{"fastai"}, Suggestion: "Consider fastdotai/fastai"},
+	{Name: "MXNet", Packages: []string{"mxnet"}, Suggestion: "Consider mxnet/python"},
+
+	// Classical ML
+	{Name: "scikit-learn", Packages: []string{"scikit-learn", "sklearn"}, Suggestion: "Consider jupyter/scipy-notebook"},
+	{Name: "XGBoost", Packages: []string{"xgboost"}, Suggestion: "Consider jupyter/scipy-notebook"},
+	{Name: "LightGBM", Packages: []string{"lightgbm"}, Suggestion: "Consider jupyter/scipy-notebook"},
+	{Name: "CatBoost", Packages: []string{"catboost"}, Suggestion: "Consider jupyter/scipy-notebook"},
+
+	// Data Science
+	{Name: "Pandas", Packages: []string{"pandas", "numpy", "scipy"}, Suggestion: "Consider jupyter/datascience-notebook"},
+	{Name: "Polars", Packages: []string{"polars"}, Suggestion: "Consider python:3.11-slim"},
+
+	// Computer Vision
+	{Name: "OpenCV", Packages: []string{"opencv-python", "cv2"}, Suggestion: "Consider jjanzic/docker-python3-opencv"},
+	{Name: "Detectron2", Packages: []string{"detectron2"}, Suggestion: "Consider pytorch/pytorch with CUDA"},
+
+	// NLP
+	{Name: "SpaCy", Packages: []string{"spacy"}, Suggestion: "Consider spacyio/spacy"},
+	{Name: "NLTK", Packages: []string{"nltk"}, Suggestion: "Consider jupyter/scipy-notebook"},
+
+	// MLOps
+	{Name: "MLflow", Packages: []string{"mlflow"}, Suggestion: "Consider ghcr.io/mlflow/mlflow"},
+	{Name: "ONNX", Packages: []string{"onnx", "onnxruntime"}, Suggestion: "Consider mcr.microsoft.com/onnxruntime"},
+	{Name: "TensorRT", Packages: []string{"tensorrt"}, Suggestion: "Consider nvcr.io/nvidia/tensorrt"},
 }
 
 func (r *MLStackRule) Check(ctx *types.DockerfileContext) []types.Issue {

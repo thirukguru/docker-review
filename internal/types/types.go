@@ -68,6 +68,7 @@ type DockerfileContext struct {
 	Lines           []string
 	Instructions    []Instruction
 	HasDockerignore bool
+	IgnoredRules    map[int][]string // line -> rule IDs to ignore
 }
 
 // Instruction represents a Dockerfile instruction

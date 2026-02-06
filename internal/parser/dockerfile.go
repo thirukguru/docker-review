@@ -11,6 +11,7 @@ import (
 )
 
 var instructionRegex = regexp.MustCompile(`^([A-Z]+)\s+(.*)$`)
+var ignoreRegex = regexp.MustCompile(`(?i)#\s*docker-review:ignore\s+(.*)`)
 
 // ParseDockerfile parses a Dockerfile into a DockerfileContext
 func ParseDockerfile(path string) (*types.DockerfileContext, error) {
@@ -25,12 +26,14 @@ Path:            path,
 Lines:           []string{},
 Instructions:    []types.Instruction{},
 HasDockerignore: checkDockerignore(path),
+IgnoredRules:    make(map[int][]string), // line -> rule IDs to ignore
 }
 
 scanner := bufio.NewScanner(file)
 lineNum := 0
 var continuationLine string
 var continuationStart int
+var pendingIgnores []string
 
 for scanner.Scan() {
 lineNum++
@@ -39,10 +42,18 @@ ctx.Lines = append(ctx.Lines, line)
 
 trimmed := strings.TrimSpace(line)
 
+// Check for ignore comments
+if matches := ignoreRegex.FindStringSubmatch(trimmed); matches != nil {
+ruleIDs := strings.Fields(matches[1])
+pendingIgnores = append(pendingIgnores, ruleIDs...)
+continue
+}
+
 if trimmed == "" || strings.HasPrefix(trimmed, "#") {
 continue
 }
 
+// Handle line continuation
 if strings.HasSuffix(trimmed, "\\") {
 if continuationLine == "" {
 continuationStart = lineNum
@@ -51,17 +62,24 @@ continuationLine += strings.TrimSuffix(trimmed, "\\") + " "
 continue
 }
 
+actualLine := lineNum
 if continuationLine != "" {
 trimmed = continuationLine + trimmed
-lineNum = continuationStart
+actualLine = continuationStart
 continuationLine = ""
+}
+
+// Apply pending ignores to this line
+if len(pendingIgnores) > 0 {
+ctx.IgnoredRules[actualLine] = pendingIgnores
+pendingIgnores = nil
 }
 
 if matches := instructionRegex.FindStringSubmatch(trimmed); matches != nil {
 ctx.Instructions = append(ctx.Instructions, types.Instruction{
 Name:      matches[1],
 Arguments: matches[2],
-Line:      lineNum,
+Line:      actualLine,
 Raw:       trimmed,
 })
 }

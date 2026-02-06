@@ -18,6 +18,8 @@ var (
 	noColor        bool
 	verbose        bool
 	jsonOutput     bool
+	sarifOutput    bool
+	htmlOutput     bool
 	ciMode         bool
 	failOn         string
 	severity       string
@@ -26,6 +28,7 @@ var (
 	fix            bool
 	fixOutput      string
 	showDiff       bool
+	outputFile     string
 )
 
 // Version info - set by main.go
@@ -96,6 +99,9 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose output")
 
 	analyzeCmd.Flags().BoolVar(&jsonOutput, "json", false, "Output in JSON format")
+	analyzeCmd.Flags().BoolVar(&sarifOutput, "sarif", false, "Output in SARIF format (GitHub Code Scanning)")
+	analyzeCmd.Flags().BoolVar(&htmlOutput, "html", false, "Output as HTML report")
+	analyzeCmd.Flags().StringVarP(&outputFile, "output", "o", "", "Write output to file")
 	analyzeCmd.Flags().BoolVar(&ciMode, "ci", false, "CI mode with exit codes")
 	analyzeCmd.Flags().StringVar(&failOn, "fail-on", "critical", "Minimum severity to fail on")
 	analyzeCmd.Flags().StringVar(&severity, "severity", "", "Filter issues by minimum severity")
@@ -168,15 +174,32 @@ func runAnalyze(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
+	// Generate output based on format
+	var outputContent string
 	if jsonOutput {
-		fmt.Println(output.FormatJSON(report))
+		outputContent = output.FormatJSON(report)
+	} else if sarifOutput {
+		outputContent = output.FormatSARIF(report, version)
+	} else if htmlOutput {
+		outputContent = output.FormatHTML(report)
 	} else if summaryOnly {
-		fmt.Printf("Issues found: %d\n", len(report.Issues))
-		fmt.Printf("  Critical: %d\n", countBySeverity(report.Issues, types.Critical))
-		fmt.Printf("  Warning: %d\n", countBySeverity(report.Issues, types.Warning))
-		fmt.Printf("  Suggestion: %d\n", countBySeverity(report.Issues, types.Suggestion))
+		outputContent = fmt.Sprintf("Issues found: %d\n  Critical: %d\n  Warning: %d\n  Suggestion: %d\n",
+			len(report.Issues),
+			countBySeverity(report.Issues, types.Critical),
+			countBySeverity(report.Issues, types.Warning),
+			countBySeverity(report.Issues, types.Suggestion))
 	} else {
-		fmt.Println(output.FormatTerminal(report, verbose, estimateImpact))
+		outputContent = output.FormatTerminal(report, verbose, estimateImpact)
+	}
+
+	// Write to file or stdout
+	if outputFile != "" {
+		if err := os.WriteFile(outputFile, []byte(outputContent), 0644); err != nil {
+			return fmt.Errorf("error writing output file: %w", err)
+		}
+		fmt.Printf("✓ Report written to: %s\n", outputFile)
+	} else {
+		fmt.Println(outputContent)
 	}
 
 	if ciMode {

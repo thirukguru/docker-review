@@ -1,0 +1,7 @@
+# docker-review:ignore DF001
+FROM ubuntu
+
+# docker-review:ignore DF002
+RUN apt-get update
+
+COPY . /app

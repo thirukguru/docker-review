@@ -2,19 +2,18 @@
 
 A fast, offline-first CLI tool that reviews Docker configurations like a Senior DevOps Engineer. It detects performance issues, security vulnerabilities, and maintainability problems, providing actionable suggestions and impact estimates.
 
-**Now in Go** - Easy cross-compilation for Linux, macOS (Intel + Apple Silicon), and Windows from a single machine!
+**Single binary** - No runtime dependencies, ~3MB. Easy CI/CD integration!
 
 ## Features
 
-- **Dockerfile Analysis** - Detects 12 types of issues (DF001-DF012)
-- **Docker Compose Analysis** - Detects 5 types of issues (DC001-DC005)
-- **Security Checks** - Root user, secrets in ENV, curl|bash patterns
-- **Performance Checks** - Layer ordering, large images, caching issues
-- **Maintainability Checks** - Health checks, restart policies, version pinning
+- **Dockerfile Analysis** - 13 rules (DF001-DF013)
+- **Docker Compose Analysis** - 11 security-focused rules (DC001-DC011)
 - **Scoring System** - Security, Performance, Maintainability scores (0-10)
-- **CI/CD Ready** - JSON output, exit codes, `--fail-on` flag
 - **Auto-Fix** - Automatically optimize Dockerfiles with `--fix`
-- **Single Binary** - No runtime dependencies, ~3MB
+- **ML Stack Detection** - Suggests optimized images for TensorFlow, PyTorch, etc.
+- **Multiple Output Formats** - Terminal, JSON, SARIF (GitHub), HTML
+- **Ignore Comments** - Suppress specific warnings inline
+- **CI/CD Ready** - Exit codes, `--fail-on` flag
 
 ## Installation
 
@@ -35,65 +34,75 @@ sudo cp docker-review /usr/local/bin/
 
 ### From Releases
 
-Download the binary for your platform from [Releases](https://github.com/thirukguru/docker-review/releases).
+Download binary from [Releases](https://github.com/thirukguru/docker-review/releases).
 
 ## Usage
 
-### Analyze a Dockerfile
+### Basic Analysis
 
 ```bash
 docker-review analyze Dockerfile
+docker-review analyze docker-compose.yml
 docker-review analyze ./path/to/project
 ```
 
-### Analyze a docker-compose file
+### Output Formats
 
 ```bash
-docker-review analyze docker-compose.yml
-```
+# Terminal (default)
+docker-review analyze Dockerfile
 
-### JSON Output (for CI)
-
-```bash
+# JSON
 docker-review analyze Dockerfile --json
+
+# SARIF (GitHub Code Scanning)
+docker-review analyze Dockerfile --sarif > results.sarif
+
+# HTML Report
+docker-review analyze Dockerfile --html -o report.html
 ```
 
 ### Auto-Fix Dockerfiles
 
 ```bash
-# Generate optimized Dockerfile
 docker-review analyze Dockerfile --fix
-
-# Save to custom path
 docker-review analyze Dockerfile --fix --fix-output Dockerfile.optimized
-
-# Show diff of changes
 docker-review analyze Dockerfile --fix --diff
 ```
 
-### CI Mode with Failure Threshold
+### CI Mode
 
 ```bash
 docker-review analyze Dockerfile --ci --fail-on critical
 docker-review analyze Dockerfile --ci --fail-on warning
 ```
 
-### List All Rules
+### Ignore Specific Rules
 
-```bash
-docker-review rules
+Add comments in your Dockerfile:
+
+```dockerfile
+# docker-review:ignore DF001
+FROM ubuntu:latest
+
+# docker-review:ignore DF002 DF003
+RUN apt-get update
+
+# docker-review:ignore all
+COPY . /app
 ```
 
-### Explain a Specific Rule
+### Other Commands
 
 ```bash
-docker-review explain DF001
-docker-review explain DC002
+docker-review rules          # List all rules
+docker-review explain DF001  # Explain a specific rule
+docker-review version        # Show version
 ```
 
 ## Rules
 
-### Dockerfile Rules (DF001-DF012)
+### Dockerfile Rules (DF001-DF013)
 
 | ID | Name | Severity |
 |----|------|----------|
@@ -109,8 +118,9 @@ docker-review explain DC002
 | DF010 | Curl pipe to shell | Critical |
 | DF011 | Inefficient layer usage | Warning |
 | DF012 | ML stack optimization | Suggestion |
+| DF013 | Incomplete .dockerignore | Warning |
 
-### Docker Compose Rules (DC001-DC005)
+### Docker Compose Rules (DC001-DC011)
 
 | ID | Name | Severity |
 |----|------|----------|
@@ -119,6 +129,12 @@ docker-review explain DC002
 | DC003 | No resource limits | Warning |
 | DC004 | Using latest tag | Critical |
 | DC005 | Hardcoded secrets | Critical |
+| DC006 | Docker socket mount | Critical |
+| DC007 | Host network mode | Critical |
+| DC008 | Dangerous volume mount | Critical |
+| DC009 | Capability additions | Warning |
+| DC010 | Database port exposed | Warning |
+| DC011 | Port bound to all interfaces | Suggestion |
 
 ## Example Output
 
@@ -138,23 +154,24 @@ File: Dockerfile
 ✗ Critical Issues
   [DF001] Using latest tag :1
     Image 'ubuntu' has no tag (implicitly uses 'latest')
-    Fix: Pin to a specific version tag (e.g., FROM node:18.17.0-alpine)
+
+💡 Suggestions
+  [DF012] ML stack optimization :3
+    TensorFlow detected: Consider tensorflow/tensorflow:gpu
 ```
 
-## Building for Multiple Platforms
+## Sample Reports
 
-One of the key advantages of the Go rewrite - build for all platforms from any machine:
+### HTML Report
+
+Generate beautiful HTML reports with `--html`:
+
+![HTML Report](images/report.png)
 
 ```bash
-make build-all
+docker-review analyze Dockerfile --html -o report.html
+# Open in browser → Print → Save as PDF
 ```
-
-This creates binaries in `dist/`:
-- `docker-review-linux-amd64`
-- `docker-review-linux-arm64`
-- `docker-review-darwin-amd64` (Intel Mac)
-- `docker-review-darwin-arm64` (Apple Silicon)
-- `docker-review-windows-amd64.exe`
 
 ## CI/CD Integration
 
@@ -165,6 +182,14 @@ This creates binaries in `dist/`:
   run: |
     curl -fsSL https://raw.githubusercontent.com/thirukguru/docker-review/main/install.sh | bash
     docker-review analyze . --ci --fail-on critical
+
+# With SARIF upload for Code Scanning
+- name: Run docker-review
+  run: |
+    docker-review analyze Dockerfile --sarif > results.sarif
+- uses: github/codeql-action/upload-sarif@v2
+  with:
+    sarif_file: results.sarif
 ```
 
 ### GitLab CI
@@ -175,6 +200,21 @@ docker-review:
     - curl -fsSL https://raw.githubusercontent.com/thirukguru/docker-review/main/install.sh | bash
     - docker-review analyze . --ci --fail-on critical
 ```
+
+## vs Hadolint
+
+| Feature | Hadolint | docker-review |
+|---------|----------|---------------|
+| Dockerfile rules | 100+ | 13 |
+| Docker Compose | ❌ | ✅ 11 rules |
+| Auto-fix | ❌ | ✅ |
+| ML optimization | ❌ | ✅ |
+| .dockerignore analysis | ❌ | ✅ |
+| SARIF output | ✅ | ✅ |
+| HTML report | ❌ | ✅ |
+| Scoring system | ❌ | ✅ |
+
+**Use both!** Hadolint for deep Dockerfile linting, docker-review for Compose + security + auto-fix.
 
 ## License
 
