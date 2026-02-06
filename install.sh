@@ -94,9 +94,9 @@ get_latest_version() {
 }
 
 download_binary() {
-    # Binary naming convention: docker-review-{platform}
-    # Example: docker-review-linux-amd64, docker-review-darwin-arm64
-    local DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${VERSION}/${BINARY_NAME}-${PLATFORM}"
+    # Binary naming convention: docker-review-{version}-{platform}
+    # Example: docker-review-v0.2.0-linux-amd64
+    local DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${VERSION}/${BINARY_NAME}-${VERSION}-${PLATFORM}"
     local TMP_DIR=$(mktemp -d)
     local TMP_FILE="${TMP_DIR}/${BINARY_NAME}"
 
