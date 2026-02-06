@@ -94,9 +94,9 @@ get_latest_version() {
 }
 
 download_binary() {
-    # Binary naming convention: docker-review-{version}-{platform}
-    # Example: docker-review-v0.1.0-linux-amd64
-    local DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${VERSION}/${BINARY_NAME}-${VERSION}-${PLATFORM}"
+    # Binary naming convention: docker-review-{platform}
+    # Example: docker-review-linux-amd64, docker-review-darwin-arm64
+    local DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${VERSION}/${BINARY_NAME}-${PLATFORM}"
     local TMP_DIR=$(mktemp -d)
     local TMP_FILE="${TMP_DIR}/${BINARY_NAME}"
 
@@ -142,7 +142,7 @@ verify_installation() {
     if command -v "$BINARY_NAME" &> /dev/null; then
         success "Installation complete!"
         echo ""
-        "$BINARY_NAME" --version
+        "$BINARY_NAME" --help | head -5
         echo ""
         echo -e "${GREEN}Run '${BINARY_NAME} --help' to get started${NC}"
     else
@@ -156,8 +156,8 @@ verify_installation() {
 install_from_source() {
     info "Installing from source..."
     
-    if ! command -v cargo &> /dev/null; then
-        error "Rust/Cargo not found. Install from https://rustup.rs/"
+    if ! command -v go &> /dev/null; then
+        error "Go not found. Install from https://go.dev/dl/"
     fi
 
     local TMP_DIR=$(mktemp -d)
@@ -165,11 +165,11 @@ install_from_source() {
     info "Cloning repository..."
     git clone --depth 1 "https://github.com/${REPO}.git" "$TMP_DIR/docker-review" || error "Failed to clone repository"
     
-    info "Building release binary (this may take a minute)..."
+    info "Building release binary..."
     cd "$TMP_DIR/docker-review"
-    cargo build --release || error "Build failed"
+    go build -ldflags="-s -w" -o "$BINARY_NAME" ./cmd/docker-review || error "Build failed"
     
-    install_binary "$TMP_DIR/docker-review/target/release/$BINARY_NAME"
+    install_binary "$TMP_DIR/docker-review/$BINARY_NAME"
 }
 
 main() {

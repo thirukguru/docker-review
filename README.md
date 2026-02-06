@@ -2,19 +2,19 @@
 
 A fast, offline-first CLI tool that reviews Docker configurations like a Senior DevOps Engineer. It detects performance issues, security vulnerabilities, and maintainability problems, providing actionable suggestions and impact estimates.
 
-[![CI](https://github.com/thirukguru/docker-review/actions/workflows/ci.yml/badge.svg)](https://github.com/thirukguru/docker-review/actions/workflows/ci.yml)
-[![Release](https://github.com/thirukguru/docker-review/actions/workflows/release.yml/badge.svg)](https://github.com/thirukguru/docker-review/releases)
+**Now in Go** - Easy cross-compilation for Linux, macOS (Intel + Apple Silicon), and Windows from a single machine!
 
 ## Features
 
-- **Dockerfile Analysis** - Detects 11 types of issues
-- **Docker Compose Analysis** - Detects 5 types of issues  
+- **Dockerfile Analysis** - Detects 12 types of issues (DF001-DF012)
+- **Docker Compose Analysis** - Detects 5 types of issues (DC001-DC005)
 - **Security Checks** - Root user, secrets in ENV, curl|bash patterns
 - **Performance Checks** - Layer ordering, large images, caching issues
 - **Maintainability Checks** - Health checks, restart policies, version pinning
 - **Scoring System** - Security, Performance, Maintainability scores (0-10)
 - **CI/CD Ready** - JSON output, exit codes, `--fail-on` flag
-- **Single Binary** - No runtime dependencies, ~2.7MB
+- **Auto-Fix** - Automatically optimize Dockerfiles with `--fix`
+- **Single Binary** - No runtime dependencies, ~3MB
 
 ## Installation
 
@@ -29,8 +29,8 @@ curl -fsSL https://raw.githubusercontent.com/thirukguru/docker-review/main/insta
 ```bash
 git clone https://github.com/thirukguru/docker-review.git
 cd docker-review
-cargo build --release
-sudo cp target/release/docker-review /usr/local/bin/
+make build
+sudo cp docker-review /usr/local/bin/
 ```
 
 ### From Releases
@@ -58,7 +58,7 @@ docker-review analyze docker-compose.yml
 docker-review analyze Dockerfile --json
 ```
 
-### Auto-Fix Dockerfiles (NEW)
+### Auto-Fix Dockerfiles
 
 ```bash
 # Generate optimized Dockerfile
@@ -128,18 +128,33 @@ File: Dockerfile
 
 📊 Scores
   Security:       ░░░░░░░░░░ 0/10
-  Performance:    █░░░░░░░░░ 1/10
-  Maintainability:████████░░ 8/10
-  Overall:        ██░░░░░░░░ 2/10
+  Performance:    ██░░░░░░░░ 2/10
+  Maintainability:███░░░░░░░ 3/10
+  Overall:        █░░░░░░░░░ 1/10
 
 📋 Issues Summary
-  5 Critical, 5 Warnings, 1 Suggestions
+  5 Critical, 5 Warnings, 2 Suggestions
 
 ✗ Critical Issues
-  [DF001] Using latest tag :2
+  [DF001] Using latest tag :1
     Image 'ubuntu' has no tag (implicitly uses 'latest')
     Fix: Pin to a specific version tag (e.g., FROM node:18.17.0-alpine)
 ```
+
+## Building for Multiple Platforms
+
+One of the key advantages of the Go rewrite - build for all platforms from any machine:
+
+```bash
+make build-all
+```
+
+This creates binaries in `dist/`:
+- `docker-review-linux-amd64`
+- `docker-review-linux-arm64`
+- `docker-review-darwin-amd64` (Intel Mac)
+- `docker-review-darwin-arm64` (Apple Silicon)
+- `docker-review-windows-amd64.exe`
 
 ## CI/CD Integration
 

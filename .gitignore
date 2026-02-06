@@ -1,2 +1,24 @@
-/target
-/releases
+# Go build artifacts
+docker-review
+/bin/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test artifacts
+*.test
+coverage.out
+
+# Releases
+/releases/
+
+# Temporary files
+*.tmp
+*.log

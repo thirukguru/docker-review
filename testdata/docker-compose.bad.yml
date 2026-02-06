@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  web:
+    image: nginx
+    privileged: true
+    environment:
+      - DB_PASSWORD=secret123
+      - API_KEY=sk-test-key
+
+  api:
+    image: node:latest
+    environment:
+      DATABASE_URL: postgres://localhost/db

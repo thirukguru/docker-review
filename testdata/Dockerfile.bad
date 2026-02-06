@@ -1,0 +1,14 @@
+FROM ubuntu
+
+RUN apt-get update
+RUN apt-get install -y curl wget
+RUN curl -fsSL https://example.com/install.sh | sh
+
+ENV DB_PASSWORD=supersecret123
+ENV API_KEY=sk-12345678
+
+COPY . /app
+RUN npm install
+
+EXPOSE 3000
+CMD ["npm", "start"]
