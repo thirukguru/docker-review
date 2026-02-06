@@ -28,6 +28,18 @@ var (
 	showDiff       bool
 )
 
+// Version info - set by main.go
+var (
+	version   = "dev"
+	buildTime = "unknown"
+)
+
+// SetVersion sets version info from main
+func SetVersion(v, bt string) {
+	version = v
+	buildTime = bt
+}
+
 var rootCmd = &cobra.Command{
 	Use:   "docker-review",
 	Short: "A fast CLI tool for analyzing Dockerfiles and docker-compose files",
@@ -70,6 +82,15 @@ var explainCmd = &cobra.Command{
 	},
 }
 
+var versionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "Print version information",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Printf("docker-review %s\n", version)
+		fmt.Printf("Built: %s\n", buildTime)
+	},
+}
+
 func init() {
 	rootCmd.PersistentFlags().BoolVar(&noColor, "no-color", false, "Disable colored output")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose output")
@@ -87,6 +108,7 @@ func init() {
 	rootCmd.AddCommand(analyzeCmd)
 	rootCmd.AddCommand(rulesCmd)
 	rootCmd.AddCommand(explainCmd)
+	rootCmd.AddCommand(versionCmd)
 }
 
 func Execute() error {

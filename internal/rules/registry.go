@@ -51,6 +51,12 @@ func init() {
 		compose.NewResourceLimitsRule(),
 		compose.NewLatestTagRule(),
 		compose.NewHardcodedSecretsRule(),
+		compose.NewDockerSocketRule(),
+		compose.NewHostNetworkRule(),
+		compose.NewDangerousVolumesRule(),
+		compose.NewCapabilitiesRule(),
+		compose.NewDatabasePortRule(),
+		compose.NewExposedPortsRule(),
 	}
 
 	// Build lookup map
@@ -86,7 +92,7 @@ func PrintAllRules() {
 		fmt.Printf("  %-6s %-30s %s\n", r.ID(), r.Name(), r.Severity())
 	}
 	fmt.Println()
-	fmt.Println("Docker Compose Rules (DC001-DC005):")
+	fmt.Println("Docker Compose Rules (DC001-DC011):")
 	fmt.Println("====================================")
 	for _, r := range composeRules {
 		fmt.Printf("  %-6s %-30s %s\n", r.ID(), r.Name(), r.Severity())

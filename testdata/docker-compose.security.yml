@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # DC006: Docker socket mount
+  dind:
+    image: docker:24-dind
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  # DC007: Host network mode
+  monitoring:
+    image: prometheus:v2.45.0
+    network_mode: host
+
+  # DC008: Dangerous volume mount
+  backup:
+    image: alpine:3.18
+    volumes:
+      - /etc:/host-etc:ro
+      - /var:/host-var
+
+  # DC009: Capability additions
+  network-tool:
+    image: alpine:3.18
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+
+  # DC010: Database port exposed
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+
+  # DC011: Explicit 0.0.0.0 binding
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "0.0.0.0:6379:6379"
